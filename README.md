@@ -25,5 +25,9 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
 
 ```R
 library(ggplot2)
+library(plyr)
+zippedFile <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
+unzippedFile <- unz(zippedFile, filename="activity.csv", open="r")
+activity <- read.csv("activity.csv")
 ```
 
