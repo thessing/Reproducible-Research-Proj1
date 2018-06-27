@@ -24,14 +24,16 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
 ## Loading & Processcing the Data
 
 ### Loading
-```R
+```r
   zippedFile <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
 unzippedFile <- unz(zippedFile, filename="activity.csv", open="r")
     activity <- read.csv("activity.csv", header=TRUE)
 summary(activity)
 ```
-###Processing
-```
+
+### Processing
+
+```r
 activity$day <- weekdays(as.Date(activity$date))
 activity$DateTime<- as.POSIXct(activity$date, format="%Y-%m-%d")
 
