@@ -175,7 +175,7 @@ colnames(meanStepsPerInterval)&lt;- c(&quot;Interval&quot;, &quot;Steps&quot;)
 <div id="results" class="section level2">
 <h2>Results</h2>
 <div id="question-1-number-of-steps-each-day" class="section level3">
-<h3>Question 1 Number of steps each Day</h3>
+<h3>Question 1 Number of Steps Each Day</h3>
 <p>To address the <strong>Question 1</strong> for this project, the mean total number of steps taken each day is <code>r meanTotalSteps</code> and the median total number of steps taken each day is <code>r medianTotalSteps</code>. The following histogram shows the frequency of the total number of steps taken per day, where the bin width is 1500 steps.</p>
 <p><code>r bins &lt;- as.integer( (max(stepsPerDay$Steps) - min(stepsPerDay$Steps))/1500 ) hist(stepsPerDay$Steps, breaks=bins, xlab=&quot;Steps&quot;, main = &quot;Total Steps per Day&quot;)</code></p>
 </div>
@@ -185,7 +185,7 @@ colnames(meanStepsPerInterval)&lt;- c(&quot;Interval&quot;, &quot;Steps&quot;)
 <p><code>r plot(meanStepsPerInterval$Interval, meanStepsPerInterval$Steps, type=&quot;l&quot;, xlab=&quot;Daily Interval&quot;, ylab=&quot;Average Steps per Interval&quot;)</code></p>
 </div>
 <div id="question-3-imputing-missing-values" class="section level3">
-<h3>Question 3 Imputing missing values</h3>
+<h3>Question 3 Imputing Missing Values</h3>
 <p>This data set contains <code>r sum(is.na(activity$steps))</code> missing values. This missing values could be re-assigned with the mean number of steps for that time interval, in order to eliminate these missing values, as follows:</p>
 <pre class="{r}"><code>newActivity &lt;- activity
 

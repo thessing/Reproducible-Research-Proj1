@@ -63,7 +63,7 @@ colnames(meanStepsPerInterval)<- c("Interval", "Steps")
 
 ## Results
 
-### Question 1 Number of steps each Day
+### Question 1 Number of Steps Each Day
 To address the **Question 1** for this project, the mean total number of steps taken each day is `r meanTotalSteps` and the median total number of steps taken each day is `r medianTotalSteps`. The following histogram shows the frequency of the total number of steps taken per day, where the bin width is 1500 steps. 
 
 `r
@@ -78,7 +78,7 @@ The following plot shows the average daily activity pattern. During the `r meanS
 plot(meanStepsPerInterval$Interval, meanStepsPerInterval$Steps, type="l", xlab="Daily Interval", ylab="Average Steps per Interval")
 `
 
-### Question 3 Imputing missing values
+### Question 3 Imputing Missing Values
 This data set contains `r sum(is.na(activity$steps))` missing values. This missing values could be re-assigned with the mean number of steps for that time interval, in order to eliminate these missing values, as follows:
 
 ```{r}
