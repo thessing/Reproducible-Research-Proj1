@@ -1,7 +1,12 @@
 ---
-title: "Coursera: Reproducible Research Project #1"
+title: 'Coursera: Reproducible Research Project #1'
 author: "Tim Hessing, PhD MBA"
 date: "June 27, 2018"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  word_document: default
 ---
 
 ## Introduction
@@ -25,49 +30,105 @@ The dataset is stored in a comma-separated-value (CSV) file and there are a tota
 ## Loading & Processing the Data
 
 ### Loading
-```r
-fileName <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
-unzippedFile <- unz(fileName, filename="activity.csv", open="r")
-    activity <- read.csv("activity.csv", header=TRUE)
-summary(activity)
+
+```{r echo=FALSE}
+
+dataDir  <- "c:/Users/hessit1/Desktop/Data Science/R Code"
+
 ```
 
-'summary(acvitity)`
-
-### Processing
-
-```r
-activity$day <- weekdays(as.Date(activity$date))
-activity$DateTime<- as.POSIXct(activity$date, format="%Y-%m-%d")
-
-##pulling data without nas
-clean <- activity[!is.na(activity$steps),]
-summary(activity)
+```{r}
+fileName <- paste(dataDir, "/", "repdata_data_activity.zip", sep="")
+dataFile <- unz(fileName, filename="activity.csv")
+activity <- read.csv(dataFile, header=TRUE)
 ```
 
+### Processing the Data
 
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r}
+activity$day      <- weekdays(as.Date(activity$date))
 ```
 
-## R Markdown
+```{r}
+stepsPerDay          <- aggregate(activity$steps ~ activity$date, FUN=sum)
+colnames(stepsPerDay)<- c("Date", "Steps")
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+meanTotalSteps   <- mean(stepsPerDay$Steps)
+medianTotalSteps <- median(stepsPerDay$Steps)
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+meanStepsPerInterval <- aggregate(activity$steps ~ activity$interval, FUN=mean)
+colnames(meanStepsPerInterval)<- c("Interval", "Steps")
 
-```{r cars}
-summary(cars)
 ```
 
-## Including Plots
+## Results
 
-You can also embed plots, for example:
+### Question 1 Number of steps each Day
+To address the **Question 1** for this project, the mean total number of steps taken each day is `r meanTotalSteps` and the median total number of steps taken each day is `r medianTotalSteps`. The following histogram shows the frequency of the total number of steps taken per day, where the bin width is 1500 steps. 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+`r
+bins <- as.integer( (max(stepsPerDay$Steps) - min(stepsPerDay$Steps))/1500 )
+hist(stepsPerDay$Steps, breaks=bins, xlab="Steps", main = "Total Steps per Day")
+`
+
+### Question 2 Daily Activity Pattern
+The following plot shows the average daily activity pattern. During the `r meanStepsPerInterval$Interval[ meanStepsPerInterval$Steps == max(meanStepsPerInterval$Steps) ]` interval there is a peak in the average number of daily steps, corresponging to `r max(meanStepsPerInterval$Steps)`.
+
+`r
+plot(meanStepsPerInterval$Interval, meanStepsPerInterval$Steps, type="l", xlab="Daily Interval", ylab="Average Steps per Interval")
+`
+
+### Question 3 Imputing missing values
+This data set contains `r sum(is.na(activity$steps))` missing values. This missing values could be re-assigned with the mean number of steps for that time interval, in order to eliminate these missing values, as follows:
+
+```{r}
+newActivity <- activity
+
+newActivity$steps[is.na(newActivity$steps)] <- meanStepsPerInterval$Steps[ meanStepsPerInterval$Interval == newActivity$interval[is.na(newActivity$steps)]]
+
+```
+The Total Number of Steps per Day can be recalculated using this new data set, as follows:
+
+```{r}
+nstepsPerDay          <- aggregate(newActivity$steps ~ newActivity$date, FUN=sum)
+colnames(nstepsPerDay)<- c("Date", "Steps")
+
+nmeanTotalSteps   <- mean(nstepsPerDay$Steps)
+nmedianTotalSteps <- median(nstepsPerDay$Steps)
+
+meanStepsPerInterval <- aggregate(activity$steps ~ activity$interval, FUN=mean)
+colnames(meanStepsPerInterval)<- c("Interval", "Steps")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+The new mean total number of steps taken each day is `r nmeanTotalSteps` and the median total number of steps taken each day is `r nmedianTotalSteps`. The following histogram shows the frequency of the total number of steps taken per day, where the bin width is 1500 steps. 
 
+`r
+bins <- as.integer( (max(nstepsPerDay$Steps) - min(nstepsPerDay$Steps))/1500 )
+hist(nstepsPerDay$Steps, breaks=bins, xlab="Steps", main = "Total Steps per Day")
+`
+
+### Question 4 Difference in Activity Patterns
+In order to seperate week-ends from week-days, the following code snippet was used to identify week-days.
+```{r}
+wends       <- c("Saturday", "Sunday")
+activity$wd <- !(activity$day %in% wends)
+```
+The factor activity$wd can then be used to look at activity patterns on week-days and week-ends.
+
+```{r}
+wdmeanStepsPerInterval <- aggregate(activity$steps[activity$wd] ~ activity$interval[activity$wd], FUN=mean)
+colnames(wdmeanStepsPerInterval)<- c("Interval", "Steps")
+
+wemeanStepsPerInterval <- aggregate(activity$steps[!activity$wd] ~ activity$interval[!activity$wd], FUN=mean)
+colnames(wemeanStepsPerInterval)<- c("Interval", "Steps")
+```
+
+This can be used to cgenerate a time-series plot for the week-days and another for the week-ends, as shown below.
+
+`r
+plot(wdmeanStepsPerInterval$Interval, wdmeanStepsPerInterval$Steps, type="l", xlab="Daily Interval", ylab="Average Steps per Interval", main="Week-Day")
+`
+
+`r
+plot(wemeanStepsPerInterval$Interval, wemeanStepsPerInterval$Steps, type="l", xlab="Daily Interval", ylab="Average Steps per Interval", main="Week-End")
+`
